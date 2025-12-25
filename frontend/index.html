@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kütüphane Yönetim Sistemi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>📚 Kütüphane Yönetim Sistemi</h1>
+            <div class="nav-links">
+                <a href="index.html" class="active">Kitaplar</a>
+                <a href="loans.html">Ödünçlerim</a>
+                <a href="fines.html">Cezalarım</a>
+                <span id="userInfo"></span>
+                <button id="logoutBtn" class="btn btn-secondary" style="display:none;">Çıkış</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <h2>Kitap Kataloğu</h2>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Kitap ara...">
+                <button id="searchBtn" class="btn btn-primary">Ara</button>
+                <button id="clearSearchBtn" class="btn btn-secondary">Temizle</button>
+            </div>
+        </div>
+
+        <div id="booksContainer" class="books-grid">
+            <!-- Kitaplar buraya yüklenecek -->
+        </div>
+
+        <div id="loadingMessage" class="loading">Yükleniyor...</div>
+        <div id="errorMessage" class="error" style="display:none;"></div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/books.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+
+
+

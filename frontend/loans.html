@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödünçlerim - Kütüphane Yönetim Sistemi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>📚 Kütüphane Yönetim Sistemi</h1>
+            <div class="nav-links">
+                <a href="index.html">Kitaplar</a>
+                <a href="loans.html" class="active">Ödünçlerim</a>
+                <a href="fines.html">Cezalarım</a>
+                <span id="userInfo"></span>
+                <button id="logoutBtn" class="btn btn-secondary" style="display:none;">Çıkış</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Ödünç Aldığım Kitaplar</h2>
+        
+        <div id="loansContainer" class="loans-list">
+            <!-- Ödünçler buraya yüklenecek -->
+        </div>
+
+        <div id="loadingMessage" class="loading">Yükleniyor...</div>
+        <div id="errorMessage" class="error" style="display:none;"></div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/loans.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+
+
+
