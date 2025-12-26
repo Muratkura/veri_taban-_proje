@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ödünçlerim - Kütüphane Yönetim Sistemi</title>
+    <title>Onay Bekleyen Ödünçler - Kütüphane Yönetim Sistemi</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -12,8 +12,9 @@
             <h1>📚 Kütüphane Yönetim Sistemi</h1>
             <div class="nav-links">
                 <a href="index.html">Kitaplar</a>
-                <a href="loans.html" class="active">Ödünçlerim</a>
+                <a href="loans.html">Ödünçlerim</a>
                 <a href="fines.html">Cezalarım</a>
+                <a href="admin-approvals.html" class="active">Onay Bekleyenler</a>
                 <span id="userInfo"></span>
                 <button id="logoutBtn" class="btn btn-secondary" style="display:none;">Çıkış</button>
             </div>
@@ -21,10 +22,10 @@
     </nav>
 
     <div class="container">
-        <h2>Ödünç Aldığım Kitaplar</h2>
+        <h2>Onay Bekleyen Ödünç Talepleri</h2>
         
-        <div id="loansContainer" class="loans-list">
-            <!-- Ödünçler buraya yüklenecek -->
+        <div id="pendingLoansContainer" class="loans-list">
+            <!-- Onay bekleyen ödünçler buraya yüklenecek -->
         </div>
 
         <div id="loadingMessage" class="loading">Yükleniyor...</div>
@@ -32,13 +33,8 @@
     </div>
 
     <script src="js/auth.js"></script>
-    <script src="js/loans.js"></script>
+    <script src="js/admin-approvals.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
-
-
-
-
-
 

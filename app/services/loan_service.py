@@ -25,7 +25,7 @@ class LoanService:
     
     @staticmethod
     def create_loan(loan_data, loan_days=14):
-        """Yeni ödünç işlemi oluştur"""
+        """Yeni ödünç işlemi oluştur (onay bekliyor)"""
         # Kitap kontrolü
         book = BookRepository.find_by_id(loan_data['book_id'])
         if not book:
@@ -39,10 +39,34 @@ class LoanService:
         if not user:
             return None, "Kullanıcı bulunamadı"
         
-        # Ödünç işlemi oluştur
+        # Ödünç işlemi oluştur (pending durumunda)
         loan = LoanRepository.create(loan_data, loan_days)
         if not loan:
             return None, "Ödünç işlemi oluşturulamadı"
+        
+        return loan.to_dict(include_details=True), None
+    
+    @staticmethod
+    def get_pending_loans():
+        """Onay bekleyen ödünç işlemlerini getir"""
+        loans = LoanRepository.get_pending_loans()
+        return [loan.to_dict(include_details=True) for loan in loans]
+    
+    @staticmethod
+    def approve_loan(loan_id):
+        """Ödünç işlemini onayla"""
+        loan = LoanRepository.approve_loan(loan_id)
+        if not loan:
+            return None, "Ödünç işlemi onaylanamadı. Kitap müsait olmayabilir veya işlem bulunamadı."
+        
+        return loan.to_dict(include_details=True), None
+    
+    @staticmethod
+    def reject_loan(loan_id):
+        """Ödünç işlemini reddet"""
+        loan = LoanRepository.reject_loan(loan_id)
+        if not loan:
+            return None, "Ödünç işlemi reddedilemedi veya işlem bulunamadı."
         
         return loan.to_dict(include_details=True), None
     
@@ -111,6 +135,8 @@ class FineService:
         if not fine:
             return None, "Ceza bulunamadı"
         return fine.to_dict(), None
+
+
 
 
 

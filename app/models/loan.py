@@ -10,7 +10,8 @@ class Loan(db.Model):
     loan_date = db.Column(db.Date, nullable=False, default=date.today)
     due_date = db.Column(db.Date, nullable=False)
     return_date = db.Column(db.Date)
-    status = db.Column(db.String(20), default='active')
+    status = db.Column(db.String(20), default='pending')
+    approval_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -46,6 +47,7 @@ class Loan(db.Model):
             'due_date': self.due_date.isoformat() if self.due_date else None,
             'return_date': self.return_date.isoformat() if self.return_date else None,
             'status': self.status,
+            'approval_status': self.approval_status,
             'is_overdue': self.is_overdue,
             'days_overdue': self.days_overdue,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -93,6 +95,8 @@ class Fine(db.Model):
     
     def __repr__(self):
         return f'<Fine {self.id} - {self.amount} TL>'
+
+
 
 
 

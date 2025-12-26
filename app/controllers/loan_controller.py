@@ -54,7 +54,7 @@ def create_loan():
             return jsonify({'message': error}), 400
         
         return jsonify({
-            'message': 'Kitap başarıyla ödünç alındı',
+            'message': 'Ödünç talebi oluşturuldu. Admin onayı bekleniyor.',
             'loan': loan
         }), 201
     except Exception as e:
@@ -99,6 +99,71 @@ def get_fines():
         return jsonify(fines_data), 200
     except Exception as e:
         return jsonify({'message': f'Hata: {str(e)}'}), 500
+
+@loan_bp.route('/pending', methods=['GET'])
+@jwt_required()
+def get_pending_loans():
+    """Onay bekleyen ödünç işlemlerini getir (sadece admin)"""
+    try:
+        from app.repositories.user_repository import UserRepository
+        current_user_id = get_jwt_identity()
+        user = UserRepository.find_by_id(current_user_id)
+        
+        if not user or not user.is_admin():
+            return jsonify({'message': 'Admin yetkisi gerekli'}), 403
+        
+        loans = LoanService.get_pending_loans()
+        return jsonify(loans), 200
+    except Exception as e:
+        return jsonify({'message': f'Hata: {str(e)}'}), 500
+
+@loan_bp.route('/<int:loan_id>/approve', methods=['PUT'])
+@jwt_required()
+def approve_loan(loan_id):
+    """Ödünç işlemini onayla (sadece admin)"""
+    try:
+        from app.repositories.user_repository import UserRepository
+        current_user_id = get_jwt_identity()
+        user = UserRepository.find_by_id(current_user_id)
+        
+        if not user or not user.is_admin():
+            return jsonify({'message': 'Admin yetkisi gerekli'}), 403
+        
+        loan, error = LoanService.approve_loan(loan_id)
+        if error:
+            return jsonify({'message': error}), 400
+        
+        return jsonify({
+            'message': 'Ödünç işlemi başarıyla onaylandı',
+            'loan': loan
+        }), 200
+    except Exception as e:
+        return jsonify({'message': f'Hata: {str(e)}'}), 500
+
+@loan_bp.route('/<int:loan_id>/reject', methods=['PUT'])
+@jwt_required()
+def reject_loan(loan_id):
+    """Ödünç işlemini reddet (sadece admin)"""
+    try:
+        from app.repositories.user_repository import UserRepository
+        current_user_id = get_jwt_identity()
+        user = UserRepository.find_by_id(current_user_id)
+        
+        if not user or not user.is_admin():
+            return jsonify({'message': 'Admin yetkisi gerekli'}), 403
+        
+        loan, error = LoanService.reject_loan(loan_id)
+        if error:
+            return jsonify({'message': error}), 400
+        
+        return jsonify({
+            'message': 'Ödünç işlemi reddedildi',
+            'loan': loan
+        }), 200
+    except Exception as e:
+        return jsonify({'message': f'Hata: {str(e)}'}), 500
+
+
 
 
 

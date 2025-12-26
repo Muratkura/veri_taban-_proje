@@ -21,8 +21,11 @@ class LoanRepository:
     
     @staticmethod
     def get_active_loans(user_id=None):
-        """Aktif ödünç işlemlerini getir"""
-        query = Loan.query.filter(Loan.status == 'active')
+        """Aktif ödünç işlemlerini getir (sadece onaylanmış olanlar)"""
+        query = Loan.query.filter(
+            Loan.status == 'active',
+            Loan.approval_status == 'approved'
+        )
         if user_id:
             query = query.filter(Loan.user_id == user_id)
         return query.all()
@@ -37,7 +40,7 @@ class LoanRepository:
     
     @staticmethod
     def create(loan_data, loan_days=14):
-        """Yeni ödünç işlemi oluştur"""
+        """Yeni ödünç işlemi oluştur (onay bekliyor)"""
         # Kitabın müsait olduğunu kontrol et
         book = Book.query.get(loan_data['book_id'])
         if not book or book.available_copies <= 0:
@@ -48,10 +51,58 @@ class LoanRepository:
             book_id=loan_data['book_id'],
             loan_date=date.today(),
             due_date=Loan.calculate_due_date(loan_days),
-            status='active'
+            status='pending',
+            approval_status='pending'
         )
         
         db.session.add(loan)
+        db.session.commit()
+        return loan
+    
+    @staticmethod
+    def get_pending_loans():
+        """Onay bekleyen ödünç işlemlerini getir"""
+        return Loan.query.filter(
+            Loan.approval_status == 'pending'
+        ).order_by(Loan.created_at.desc()).all()
+    
+    @staticmethod
+    def approve_loan(loan_id):
+        """Ödünç işlemini onayla"""
+        loan = LoanRepository.find_by_id(loan_id)
+        if not loan:
+            return None
+        
+        if loan.approval_status != 'pending':
+            return None
+        
+        # Kitabın hala müsait olduğunu kontrol et
+        book = Book.query.get(loan.book_id)
+        if not book or book.available_copies <= 0:
+            return None
+        
+        loan.approval_status = 'approved'
+        loan.status = 'active'
+        
+        # Kitap kopyasını azalt
+        book.available_copies -= 1
+        
+        db.session.commit()
+        return loan
+    
+    @staticmethod
+    def reject_loan(loan_id):
+        """Ödünç işlemini reddet"""
+        loan = LoanRepository.find_by_id(loan_id)
+        if not loan:
+            return None
+        
+        if loan.approval_status != 'pending':
+            return None
+        
+        loan.approval_status = 'rejected'
+        loan.status = 'rejected'
+        
         db.session.commit()
         return loan
     
@@ -123,6 +174,8 @@ class FineRepository:
             db.session.commit()
             return fine
         return None
+
+
 
 
 

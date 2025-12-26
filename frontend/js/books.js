@@ -89,7 +89,8 @@ async function borrowBook(bookId) {
         });
         
         if (response.ok) {
-            alert('Kitap başarıyla ödünç alındı!');
+            const data = await response.json();
+            alert(data.message || 'Ödünç talebi oluşturuldu. Admin onayı bekleniyor.');
             loadBooks(); // Liste güncellensin
         } else {
             const data = await response.json();
@@ -137,6 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
 
 
 

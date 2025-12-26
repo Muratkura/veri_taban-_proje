@@ -59,12 +59,14 @@ CREATE TABLE IF NOT EXISTS loans (
     loan_date DATE NOT NULL DEFAULT (CURRENT_DATE),
     due_date DATE NOT NULL,
     return_date DATE,
-    status VARCHAR(20) DEFAULT 'active',
+    status VARCHAR(20) DEFAULT 'pending',
+    approval_status VARCHAR(20) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
-    CHECK (status IN ('active', 'returned', 'overdue'))
+    CHECK (status IN ('pending', 'active', 'returned', 'overdue')),
+    CHECK (approval_status IN ('pending', 'approved', 'rejected'))
 );
 
 -- Ceza tablosu
@@ -81,13 +83,13 @@ CREATE TABLE IF NOT EXISTS fines (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Trigger: Kitap ödünç alındığında available_copies'i azalt
+-- Trigger: Kitap ödünç alındığında available_copies'i azalt (sadece onaylandığında)
 DELIMITER //
 CREATE TRIGGER decrease_book_copies 
-AFTER INSERT ON loans
+AFTER UPDATE ON loans
 FOR EACH ROW
 BEGIN
-    IF NEW.status = 'active' THEN
+    IF NEW.approval_status = 'approved' AND OLD.approval_status = 'pending' AND NEW.status = 'active' THEN
         UPDATE books
         SET available_copies = available_copies - 1
         WHERE id = NEW.book_id AND available_copies > 0;

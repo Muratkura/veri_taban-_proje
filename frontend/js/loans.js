@@ -30,10 +30,24 @@ function displayLoans(loansList) {
     }
     
     container.innerHTML = loansList.map(loan => {
-        const statusClass = loan.status === 'active' ? 'active' : 
-                          loan.status === 'overdue' ? 'overdue' : 'returned';
-        const statusText = loan.status === 'active' ? 'Aktif' : 
-                          loan.status === 'overdue' ? 'Vadesi Geçmiş' : 'İade Edildi';
+        let statusClass, statusText;
+        
+        if (loan.approval_status === 'pending') {
+            statusClass = 'pending';
+            statusText = 'Onay Bekliyor';
+        } else if (loan.approval_status === 'rejected') {
+            statusClass = 'rejected';
+            statusText = 'Reddedildi';
+        } else if (loan.status === 'active') {
+            statusClass = 'active';
+            statusText = 'Aktif';
+        } else if (loan.status === 'overdue') {
+            statusClass = 'overdue';
+            statusText = 'Vadesi Geçmiş';
+        } else {
+            statusClass = 'returned';
+            statusText = 'İade Edildi';
+        }
         
         return `
             <div class="loan-item">
@@ -47,7 +61,7 @@ function displayLoans(loansList) {
                 </div>
                 <div class="loan-status">
                     <span class="status-badge ${statusClass}">${statusText}</span>
-                    ${loan.status === 'active' ? `
+                    ${loan.status === 'active' && loan.approval_status === 'approved' ? `
                         <button class="btn btn-success" onclick="returnLoan(${loan.id})">
                             İade Et
                         </button>
@@ -80,6 +94,8 @@ async function returnLoan(loanId) {
         alert('Hata: ' + err.message);
     }
 }
+
+
 
 
 
