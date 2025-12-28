@@ -1,6 +1,14 @@
+"""
+Kitap, Yazar ve Kategori servisleri
+Kitap yönetimi işlemlerini yönetir
+"""
 from app.repositories.book_repository import BookRepository, AuthorRepository, CategoryRepository
 
 class BookService:
+    """
+    Kitap işlemleri için servis sınıfı
+    Kitap CRUD işlemlerini ve arama işlemlerini yönetir
+    """
     @staticmethod
     def get_all_books():
         """Tüm kitapları getir"""
@@ -25,6 +33,20 @@ class BookService:
     def get_available_books():
         """Müsait kitapları getir"""
         books = BookRepository.get_available_books()
+        return [book.to_dict() for book in books]
+    
+    @staticmethod
+    def get_books_by_category(category_id):
+        """
+        Belirli bir kategoriye ait kitapları getirir
+        
+        Args:
+            category_id (int): Kategori ID'si
+        
+        Returns:
+            list: Kategoriye ait kitap dictionary'leri
+        """
+        books = BookRepository.get_by_category(category_id)
         return [book.to_dict() for book in books]
     
     @staticmethod

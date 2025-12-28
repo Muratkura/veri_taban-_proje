@@ -1,6 +1,14 @@
 """
 Veritabanını örnek verilerle doldurmak için script
-Kullanım: python populate_database.py
+
+Bu script, kütüphane yönetim sisteminin veritabanını örnek verilerle doldurur.
+Kategoriler, yazarlar ve kitaplar eklenir. Mevcut veriler varsa atlanır.
+
+Kullanım:
+    python populate_database.py
+
+Not: Bu script idempotent'tir, yani birden fazla kez çalıştırılabilir.
+     Mevcut kayıtları tekrar eklemez.
 """
 
 from app import create_app, db
@@ -9,13 +17,24 @@ from datetime import date
 import sys
 
 def populate_database():
-    """Veritabanını örnek verilerle doldur"""
+    """
+    Veritabanını örnek verilerle doldurur
+    
+    Bu fonksiyon:
+    1. Kategorileri ekler (Roman, Tarih, Bilim, vs.)
+    2. Yazarları ekler (Türk ve yabancı yazarlar)
+    3. Kitapları ekler (her yazar için birkaç kitap)
+    
+    Mevcut kayıtları kontrol eder ve tekrar eklemez.
+    """
+    # Flask uygulamasını oluştur
     app = create_app()
     
+    # Uygulama context'i içinde çalış
     with app.app_context():
         print("Veritabani dolduruluyor...")
         
-        # Kategoriler
+        # Kategoriler: Kitap kategorilerini tanımla
         categories_data = [
             ('Roman', 'Kurgu romanlar ve edebiyat eserleri'),
             ('Tarih', 'Tarih kitapları ve araştırmaları'),
@@ -34,18 +53,23 @@ def populate_database():
             ('Mizah', 'Mizah ve komedi kitapları'),
         ]
         
+        # Kategori haritası oluştur (isim -> kategori nesnesi)
         category_map = {}
         for name, desc in categories_data:
+            # Kategori zaten var mı kontrol et
             category = Category.query.filter_by(name=name).first()
             if not category:
+                # Yoksa yeni kategori oluştur
                 category = Category(name=name, description=desc)
                 db.session.add(category)
+                # Veritabanına yaz (henüz commit yapmadan)
                 db.session.flush()
+            # Haritaya ekle (yeni veya mevcut)
             category_map[name] = category
         
         print(f"[OK] {len(category_map)} kategori eklendi/guncellendi")
         
-        # Yazarlar
+        # Yazarlar: Kitap yazarlarını tanımla
         authors_data = [
             # Türk Yazarlar
             ('Orhan', 'Pamuk', date(1952, 6, 7), 'Nobel Edebiyat Ödülü sahibi Türk yazar. Modern Türk edebiyatının önemli isimlerinden.'),
@@ -86,10 +110,13 @@ def populate_database():
             ('Leo', 'Tolstoy', date(1828, 9, 9), 'Rus yazar. Savaş ve Barış, Anna Karenina ile ünlü.'),
         ]
         
+        # Yazar haritası oluştur ((ad, soyad) -> yazar nesnesi)
         author_map = {}
         for first_name, last_name, birth_date, bio in authors_data:
+            # Yazar zaten var mı kontrol et
             author = Author.query.filter_by(first_name=first_name, last_name=last_name).first()
             if not author:
+                # Yoksa yeni yazar oluştur
                 author = Author(
                     first_name=first_name,
                     last_name=last_name,
@@ -97,12 +124,14 @@ def populate_database():
                     biography=bio
                 )
                 db.session.add(author)
+                # Veritabanına yaz (henüz commit yapmadan)
                 db.session.flush()
+            # Haritaya ekle (yeni veya mevcut)
             author_map[(first_name, last_name)] = author
         
         print(f"[OK] {len(author_map)} yazar eklendi/guncellendi")
         
-        # Kitaplar
+        # Kitaplar: Kitap listesini tanımla
         books_data = [
             # Orhan Pamuk
             ('Kafamda Bir Tuhaflık', '9789750827988', ('Orhan', 'Pamuk'), 'Roman', date(2014, 3, 1), 'Yapı Kredi Yayınları', 5, 'Orhan Pamuk''un modern İstanbul romanı. Bir sokak satıcısının hikayesi.'),
@@ -209,23 +238,29 @@ def populate_database():
             ('Bir Bilim Adamının Romanı', '9789750805182', ('Oğuz', 'Atay'), 'Biyografi', date(1975, 1, 1), 'İletişim Yayınları', 2, 'Biyografik bir roman.'),
         ]
         
+        # Kitap sayacı (kaç yeni kitap eklendiğini takip etmek için)
         book_count = 0
         for title, isbn, author_key, category_name, pub_date, publisher, copies, desc in books_data:
-            # Kitap zaten var mı kontrol et
+            # Kitap zaten var mı kontrol et (ISBN ile)
             existing = Book.query.filter_by(isbn=isbn).first()
             if existing:
+                # Varsa atla (tekrar ekleme)
                 continue
             
+            # Yazar ve kategoriyi haritalardan al
             author = author_map.get(author_key)
             category = category_map.get(category_name)
             
+            # Yazar bulunamadıysa uyar ve atla
             if not author:
                 print(f"[UYARI] {author_key} yazari bulunamadi, kitap atlaniyor: {title}")
                 continue
+            # Kategori bulunamadıysa uyar ve atla
             if not category:
                 print(f"[UYARI] {category_name} kategorisi bulunamadi, kitap atlaniyor: {title}")
                 continue
             
+            # Yeni kitap oluştur
             book = Book(
                 title=title,
                 isbn=isbn,
@@ -234,26 +269,30 @@ def populate_database():
                 publication_date=pub_date,
                 publisher=publisher,
                 total_copies=copies,
-                available_copies=copies,
+                available_copies=copies,  # Başlangıçta tüm kopyalar müsait
                 description=desc
             )
             db.session.add(book)
             book_count += 1
         
-        # Degisiklikleri kaydet
+        # Tüm değişiklikleri veritabanına kaydet
         try:
+            # Tüm değişiklikleri kaydet
             db.session.commit()
             print(f"[OK] {book_count} yeni kitap eklendi")
             print("\n[BASARILI] Veritabani basariyla dolduruldu!")
             print(f"\nOzet:")
             print(f"  - Kategoriler: {len(category_map)}")
             print(f"  - Yazarlar: {len(author_map)}")
+            # Veritabanındaki toplam kitap sayısını göster
             print(f"  - Kitaplar: {Book.query.count()}")
         except Exception as e:
+            # Hata durumunda değişiklikleri geri al
             db.session.rollback()
             print(f"[HATA] {str(e)}")
             sys.exit(1)
 
+# Script doğrudan çalıştırılırsa fonksiyonu çağır
 if __name__ == '__main__':
     populate_database()
 

@@ -1,3 +1,7 @@
+"""
+Ödünç ve Ceza servisleri
+Ödünç işlemi yönetimi ve ceza hesaplamalarını yönetir
+"""
 from app.repositories.loan_repository import LoanRepository, FineRepository
 from app.repositories.book_repository import BookRepository
 from app.repositories.user_repository import UserRepository
@@ -5,6 +9,10 @@ from app.services.email_service import EmailService
 from datetime import date
 
 class LoanService:
+    """
+    Ödünç işlemi servisi
+    Kitap ödünç alma, iade, onay ve red işlemlerini yönetir
+    """
     @staticmethod
     def get_all_loans():
         """Tüm ödünç işlemlerini getir"""

@@ -1,8 +1,13 @@
+"""
+Kimlik doğrulama controller'ı
+Kullanıcı kaydı, girişi ve profil işlemleri için endpoint'ler
+"""
 from flask import Blueprint, request, jsonify
 from app.services.auth_service import AuthService
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.repositories.user_repository import UserRepository
 
+# Auth blueprint'i: /api/auth/* endpoint'leri için
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])

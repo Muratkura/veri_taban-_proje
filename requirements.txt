@@ -1,12 +1,52 @@
+# Python Bağımlılıkları (Dependencies)
+# Bu dosya, projenin çalışması için gerekli tüm Python paketlerini ve versiyonlarını içerir
+# 
+# Kullanım:
+#   1. Tüm paketleri yüklemek için:
+#      pip install -r requirements.txt
+#   
+#   2. Yeni bir paket ekledikten sonra güncellemek için:
+#      pip freeze > requirements.txt
+#
+# ==============================================================================
+
+# Web Framework - Flask: Python web uygulamaları için mikro framework
 Flask==3.0.0
+
+# Veritabanı ORM - Flask-SQLAlchemy: Flask ile SQLAlchemy entegrasyonu
+# Veritabanı işlemlerini kolaylaştırır (model tanımlama, sorgu yazma)
 Flask-SQLAlchemy==3.1.1
+
+# JWT Token Yönetimi - Flask-JWT-Extended: JSON Web Token desteği
+# Kullanıcı kimlik doğrulama ve yetkilendirme için
 Flask-JWT-Extended==4.6.0
+
+# CORS Desteği - Flask-CORS: Cross-Origin Resource Sharing
+# Farklı domain'lerden gelen isteklere izin verir (frontend-backend arası iletişim)
 Flask-CORS==4.0.0
+
+# MySQL Bağlantısı - PyMySQL: MySQL veritabanı için Python driver
+# MySQL veritabanına bağlanmak için
 PyMySQL==1.1.0
+
+# Ortam Değişkenleri - python-dotenv: .env dosyası desteği
+# Hassas bilgileri (şifreler, API anahtarları) .env dosyasında saklamak için
 python-dotenv==1.0.0
+
+# E-posta Doğrulama - email-validator: E-posta formatı doğrulama
+# Geçerli e-posta adresi kontrolü için
 email-validator==2.1.0
+
+# WSGI Utilities - Werkzeug: Flask'in temel kütüphanesi
+# HTTP isteklerini işlemek, URL routing için (Flask'in bağımlılığı)
 Werkzeug==3.0.1
+
+# JWT Kütüphanesi - PyJWT: JSON Web Token oluşturma ve doğrulama
+# JWT token'larını encode/decode etmek için
 PyJWT==2.8.0
+
+# E-posta Gönderimi - flask-mail: Flask için e-posta gönderme desteği
+# Kullanıcılara e-posta göndermek için (ödünç hatırlatmaları, ceza bildirimleri)
 flask-mail==0.10.0
 
 

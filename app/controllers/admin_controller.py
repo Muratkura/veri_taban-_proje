@@ -1,9 +1,15 @@
+"""
+Admin controller'ı
+Yönetici paneli işlemleri için endpoint'ler
+İstatistikler, kullanıcı yönetimi, yazar ve kategori yönetimi
+"""
 from flask import Blueprint, request, jsonify
 from app.services.admin_service import AdminService
 from app.services.book_service import AuthorService, CategoryService
 from flask_jwt_extended import jwt_required
 from app.utils.decorators import admin_required
 
+# Admin blueprint'i: /api/admin/* endpoint'leri için
 admin_bp = Blueprint('admin', __name__)
 
 @admin_bp.route('/statistics', methods=['GET'])

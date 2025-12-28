@@ -1,7 +1,49 @@
+"""
+Book Repository (Kitap Deposu)
+Repository Pattern kullanarak veritabanı işlemlerini yönetir
+
+Repository Pattern Nedir?
+==========================
+Repository Pattern, veritabanı işlemlerini (CRUD) ayrı bir katmanda toplayan 
+bir yazılım tasarım desenidir. Bu desen sayesinde:
+
+1. Veritabanı kodları tek bir yerde toplanır (Merkezi yönetim)
+2. İş mantığı (business logic) veritabanı detaylarından ayrılır
+3. Veritabanı değiştiğinde sadece repository'ler etkilenir
+4. Test edilebilirlik artar (mock repository oluşturulabilir)
+5. Kod tekrarı önlenir
+
+Katmanlar:
+- Controller → Service → Repository → Model → Database
+
+Örnek:
+    Controller: HTTP isteklerini alır
+    Service: İş mantığını uygular (örn: validasyon, email gönderme)
+    Repository: Sadece veritabanı işlemlerini yapar (CREATE, READ, UPDATE, DELETE)
+    Model: Veritabanı tablosunu temsil eder
+
+Avantajları:
+- Kod organizasyonu daha iyi olur
+- Bakım ve değişiklik yapmak kolaylaşır
+- Farklı veritabanlarına geçiş kolaylaşır
+- Unit test yazmak daha kolay olur
+"""
 from app import db
 from app.models.book import Book, Author, Category
 
 class BookRepository:
+    """
+    Kitap veritabanı işlemleri için repository sınıfı
+    
+    Bu sınıf, kitap verileriyle ilgili TÜM veritabanı işlemlerini içerir:
+    - Kitap ekleme (CREATE)
+    - Kitap okuma/getirme (READ)
+    - Kitap güncelleme (UPDATE)
+    - Kitap silme (DELETE)
+    
+    Not: Bu sınıf SADECE veritabanı işlemleri yapar.
+         İş mantığı (validasyon, email gönderme vb.) Service katmanında yapılır.
+    """
     @staticmethod
     def find_by_id(book_id):
         """ID ile kitap bul"""
@@ -28,6 +70,19 @@ class BookRepository:
     def get_available_books():
         """Müsait kitapları getir"""
         return Book.query.filter(Book.available_copies > 0).all()
+    
+    @staticmethod
+    def get_by_category(category_id):
+        """
+        Belirli bir kategoriye ait kitapları getirir
+        
+        Args:
+            category_id (int): Kategori ID'si
+        
+        Returns:
+            list: Kategoriye ait kitap nesneleri
+        """
+        return Book.query.filter(Book.category_id == category_id).all()
     
     @staticmethod
     def create(book_data):
@@ -171,6 +226,7 @@ class CategoryRepository:
         
         db.session.commit()
         return category
+
 
 
 

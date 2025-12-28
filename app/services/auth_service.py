@@ -1,8 +1,16 @@
+"""
+Kimlik doğrulama servisi
+Kullanıcı kaydı ve giriş işlemlerini yönetir
+"""
 from app.repositories.user_repository import UserRepository
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
 
 class AuthService:
+    """
+    Kimlik doğrulama işlemleri için servis sınıfı
+    Kullanıcı kaydı ve giriş işlemlerini yönetir
+    """
     @staticmethod
     def register(user_data):
         """Yeni kullanıcı kaydı"""

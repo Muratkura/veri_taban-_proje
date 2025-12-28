@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Admin navigasyonunu göster/gizle
     updateAdminNavigation();
     
+    // Admin butonlarını güncelle (varsa)
+    if (typeof updateAddBookButton === 'function') {
+        updateAddBookButton();
+    }
+    
     // Sayfa bazlı işlemler
     const currentPage = window.location.pathname.split('/').pop();
     

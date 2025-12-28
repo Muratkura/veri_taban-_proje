@@ -1,19 +1,38 @@
+"""
+Kitap controller'ı
+Kitap listeleme, arama, ekleme, güncelleme ve silme işlemleri için endpoint'ler
+"""
 from flask import Blueprint, request, jsonify
-from app.services.book_service import BookService
+from app.services.book_service import BookService, CategoryService
 from flask_jwt_extended import jwt_required
 from app.utils.decorators import admin_required
 
+# Book blueprint'i: /api/books/* endpoint'leri için
 book_bp = Blueprint('books', __name__)
 
 @book_bp.route('', methods=['GET'])
 def get_all_books():
-    """Tüm kitapları listele"""
+    """
+    Tüm kitapları listele
+    Query parametreleri:
+        - q: Arama terimi (başlık, ISBN, yayınevi)
+        - category_id: Kategoriye göre filtreleme
+    """
     try:
+        # Kategori filtresi varsa kategoriye göre filtrele
+        category_id = request.args.get('category_id')
+        if category_id:
+            try:
+                category_id = int(category_id)
+                books = BookService.get_books_by_category(category_id)
+            except ValueError:
+                return jsonify({'message': 'Geçersiz kategori ID'}), 400
         # Arama parametresi varsa ara
-        query = request.args.get('q')
-        if query:
+        elif request.args.get('q'):
+            query = request.args.get('q')
             books = BookService.search_books(query)
         else:
+            # Tüm kitapları getir
             books = BookService.get_all_books()
         
         return jsonify(books), 200
@@ -91,6 +110,15 @@ def delete_book(book_id):
             return jsonify({'message': error}), 404
         
         return jsonify({'message': 'Kitap başarıyla silindi'}), 200
+    except Exception as e:
+        return jsonify({'message': f'Hata: {str(e)}'}), 500
+
+@book_bp.route('/categories', methods=['GET'])
+def get_categories():
+    """Tüm kategorileri listele (Herkes erişebilir)"""
+    try:
+        categories = CategoryService.get_all_categories()
+        return jsonify(categories), 200
     except Exception as e:
         return jsonify({'message': f'Hata: {str(e)}'}), 500
 

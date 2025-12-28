@@ -1,7 +1,12 @@
+"""
+Ödünç işlemi controller'ı
+Kitap ödünç alma, iade, onay ve ceza işlemleri için endpoint'ler
+"""
 from flask import Blueprint, request, jsonify
 from app.services.loan_service import LoanService
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+# Loan blueprint'i: /api/loans/* endpoint'leri için
 loan_bp = Blueprint('loans', __name__)
 
 @loan_bp.route('', methods=['GET'])
